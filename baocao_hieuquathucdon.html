@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Báo cáo hiệu quả thực đơn</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body { padding: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 class="mb-4">Báo cáo hiệu quả thực đơn</h2>
+    <a href="dashboard.html" class="btn btn-secondary mb-3">
+        <i class="fas fa-arrow-left"></i> Quay lại Dashboard
+    </a>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Mã món ăn</th>
+          <th>Tổng số lượng</th>
+          <th>Doanh thu (VNĐ)</th>
+        </tr>
+      </thead>
+      <tbody id="reportBody"></tbody>
+      <tfoot>
+        <tr>
+          <th>Tổng</th>
+          <th id="totalQty">0</th>
+          <th id="totalRev">0</th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <script>
+    // Dữ liệu mẫu: thay thành fetch từ API hoặc lưu localStorage tuỳ setup
+    const invoiceDetails = [
+      { dishId: 'M01', quantity: 2, unitPrice: 50000 },
+      { dishId: 'M02', quantity: 1, unitPrice: 75000 },
+      { dishId: 'M01', quantity: 3, unitPrice: 50000 },
+      // ...
+    ];
+
+    function renderMenuReport() {
+      const map = {};
+      invoiceDetails.forEach(d => {
+        if (!map[d.dishId]) map[d.dishId] = { qty: 0, rev: 0 };
+        map[d.dishId].qty += d.quantity;
+        map[d.dishId].rev += d.quantity * d.unitPrice;
+      });
+
+      const tbody = document.getElementById('reportBody');
+      let totalQty = 0, totalRev = 0;
+      tbody.innerHTML = '';
+
+      Object.entries(map).forEach(([dishId, data]) => {
+        totalQty += data.qty;
+        totalRev += data.rev;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${dishId}</td>
+          <td>${data.qty}</td>
+          <td>${data.rev.toLocaleString()}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('totalQty').textContent = totalQty;
+      document.getElementById('totalRev').textContent = totalRev.toLocaleString();
+    }
+
+    // Khởi tạo khi load trang
+    document.addEventListener('DOMContentLoaded', renderMenuReport);
+  </script>
+</body>
+</html>

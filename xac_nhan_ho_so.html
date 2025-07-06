@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác nhận Hồ sơ Nhân viên</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body { padding: 20px; background-color: #f8f9fa; }
+        .action-buttons .btn { margin: 0 5px; }
+        .table thead th { vertical-align: middle; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- BƯỚC 2: NGƯỜI DÙNG TRUY CẬP CHỨC NĂNG -->
+        <h2 class="mb-4">Xác nhận Hồ sơ Nhân viên</h2>
+        <a href="dashboard.html" class="btn btn-secondary mb-3">
+            <i class="fas fa-arrow-left"></i> Quay lại Dashboard
+        </a>
+
+        <div class="card">
+            <div class="card-header">
+                Danh sách hồ sơ đang chờ phê duyệt
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Họ tên</th>
+                            <th>Tên đăng nhập</th>
+                            <th>Chức vụ</th>
+                            <th>Ngày yêu cầu</th>
+                            <th class="text-center">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pending-profiles-table">
+                        <!-- Dữ liệu các hồ sơ đang chờ sẽ được JS render vào đây -->
+                    </tbody>
+                </table>
+                <!-- Thông báo hiển thị khi không có hồ sơ nào chờ -->
+                <div id="no-profiles-message" class="alert alert-info text-center" style="display: none;">
+                    Không có hồ sơ nào đang chờ xác nhận.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // --- DỮ LIỆU GIẢ (MOCK DATA) ---
+        // Giả lập danh sách nhân viên với các trạng thái khác nhau
+        let allEmployees = [
+            { id: 1, name: 'Trần Thị Bình', username: 'binhtt', role: 'Nhân viên phục vụ', requestDate: '2024-05-20', status: 'pending' },
+            { id: 2, name: 'Lê Văn Cường', username: 'cuonglv', role: 'Đầu bếp', requestDate: '2024-05-21', status: 'pending' },
+            { id: 3, name: 'Phạm Thị Duyên', username: 'duyenpt', role: 'Thu ngân', requestDate: '2024-05-19', status: 'approved' }, // Đã duyệt, sẽ không hiển thị
+            { id: 4, name: 'Hoàng Văn Em', username: 'emhv', role: 'Bảo vệ', requestDate: '2024-05-22', status: 'pending' },
+        ];
+
+        // --- LẤY CÁC ELEMENT CẦN THIẾT ---
+        const tableBody = document.getElementById('pending-profiles-table');
+        const noProfilesMessage = document.getElementById('no-profiles-message');
+
+        // --- HÀM RENDER GIAO DIỆN ---
+        function renderPendingProfiles() {
+            // Lọc ra các nhân viên đang chờ xác nhận
+            const pendingEmployees = allEmployees.filter(emp => emp.status === 'pending');
+            
+            // Xóa nội dung cũ của bảng
+            tableBody.innerHTML = '';
+
+            // Kiểm tra nếu không có hồ sơ nào chờ
+            if (pendingEmployees.length === 0) {
+                noProfilesMessage.style.display = 'block';
+                tableBody.parentElement.style.display = 'none'; // Ẩn luôn cả table
+            } else {
+                noProfilesMessage.style.display = 'none';
+                tableBody.parentElement.style.display = 'table'; // Hiện lại table
+                
+                // Vẽ lại bảng với danh sách hồ sơ đang chờ
+                pendingEmployees.forEach((emp, index) => {
+                    const row = `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${emp.name}</td>
+                            <td>${emp.username}</td>
+                            <td>${emp.role}</td>
+                            <td>${new Date(emp.requestDate).toLocaleDateString('vi-VN')}</td>
+                            <td class="text-center action-buttons">
+                                <!-- BƯỚC 3: Nút để thực hiện luồng chính -->
+                                <button class="btn btn-success btn-sm" onclick="approveProfile(${emp.id})">
+                                    <i class="fas fa-check"></i> Xác nhận
+                                </button>
+                                <!-- NGOẠI LỆ: Nút để thực hiện luồng ngoại lệ -->
+                                <button class="btn btn-danger btn-sm" onclick="rejectProfile(${emp.id})">
+                                    <i class="fas fa-times"></i> Từ chối
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+            }
+        }
+
+        // --- CÁC HÀM XỬ LÝ HÀNH ĐỘNG ---
+
+        // Luồng chính: Xác nhận hồ sơ
+        window.approveProfile = function(employeeId) {
+            const employee = allEmployees.find(emp => emp.id === employeeId);
+            if (employee && confirm(`Bạn có chắc muốn xác nhận hồ sơ cho nhân viên "${employee.name}"?`)) {
+                // Thay đổi trạng thái
+                employee.status = 'approved';
+                
+                // Giả lập gửi thông báo
+                alert(`Hệ thống gửi thông báo "Hồ sơ đã được xác nhận" tới tài khoản nhân viên ${employee.username}.`);
+                
+                // Cập nhật lại giao diện
+                renderPendingProfiles();
+            }
+        }
+
+        // Luồng ngoại lệ: Từ chối hồ sơ
+        window.rejectProfile = function(employeeId) {
+            const employee = allEmployees.find(emp => emp.id === employeeId);
+            if (employee && confirm(`Bạn có chắc muốn TỪ CHỐI hồ sơ của nhân viên "${employee.name}"?`)) {
+                // Thay đổi trạng thái
+                employee.status = 'rejected';
+
+                // Giả lập gửi thông báo
+                alert(`Hệ thống gửi thông báo "Từ chối phê duyệt hồ sơ" tới tài khoản nhân viên ${employee.username}.`);
+
+                // Cập nhật lại giao diện
+                renderPendingProfiles();
+            }
+        }
+
+        // --- KHỞI CHẠY LẦN ĐẦU ---
+        renderPendingProfiles();
+    });
+    </script>
+</body>
+</html>

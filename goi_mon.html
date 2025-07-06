@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Gọi món</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body { padding: 20px; background-color: #f8f9fa; }
+        .btn { margin: 5px 0; }
+        .modal-lg { max-width: 800px; }
+        .item-list { max-height: 200px; overflow-y: auto; }
+        .table thead th { background-color: #e9ecef; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="mb-4">Quản lý Gọi món</h2>
+        <a href="dashboard.html" class="btn btn-secondary"> Quay lại Dashboard</a>
+        <!-- ĐỔI TÊN NÚT ĐỂ PHÙ HỢP HƠN -->
+        <button class="btn btn-success" onclick="openNewOrderModal()">
+            Tạo phiếu gọi món mới
+        </button>
+        
+        <table class="table table-bordered table-hover mt-3">
+            <thead class="thead-light">
+                <tr>
+                    <th>Mã phiếu</th>
+                    <th>Mã bàn</th>
+                    <th>Thời gian tạo</th>
+                    <th>Tổng tiền</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody id="orderTable">
+                <!-- Dữ liệu phiếu gọi món sẽ được render ở đây -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- MODAL GỌI MÓN - ĐƯỢC THIẾT KẾ LẠI HOÀN TOÀN THEO USE CASE -->
+    <!-- =================================================================== -->
+    <div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderModalLabel">Tạo phiếu gọi món</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- BƯỚC 1: CHỌN BÀN GỌI MÓN -->
+                    <div class="form-group">
+                        <label for="tableSelect"><b>1. Chọn bàn gọi món</b></label>
+                        <select class="form-control" id="tableSelect"></select>
+                    </div>
+                    <hr>
+
+                    <!-- BƯỚC 2: CHỌN CÁC MÓN CẦN GỌI -->
+                    <label><b>2. Chọn món và số lượng</b></label>
+                    <div class="card p-3">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="dishSelect">Tên món ăn</label>
+                                    <select class="form-control" id="dishSelect"></select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="quantityInput">Số lượng</label>
+                                    <input type="number" class="form-control" id="quantityInput" value="1" min="1">
+                                </div>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <div class="form-group">
+                                    <button class="btn btn-info" onclick="addDishToPendingOrder()">Thêm món</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- DANH SÁCH CÁC MÓN ĐÃ CHỌN (TẠM THỜI) -->
+                    <h5 class="mt-4">Các món đã chọn</h5>
+                    <div class="item-list">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr><th>Tên món</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th><th>Xóa</th></tr>
+                            </thead>
+                            <tbody id="pendingOrderItems">
+                                <!-- Các món đang chờ xác nhận sẽ hiện ở đây -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <h4 class="text-right mt-2">Tổng cộng: <span id="pendingTotal" class="text-danger">0</span> VNĐ</h4>
+                </div>
+                <div class="modal-footer">
+                    <!-- NGOẠI LỆ: Người dùng chọn Hủy -->
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                    <!-- BƯỚC 3: XÁC NHẬN GỌI MÓN -->
+                    <button type="button" class="btn btn-primary" onclick="confirmOrder()">Xác nhận gọi món</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal xem chi tiết phiếu đặt -->
+    <div class="modal fade" id="orderDetailsModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chi tiết phiếu gọi món</h5>
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                </div>
+                <div class="modal-body" id="orderDetailsBody">
+                    <!-- Chi tiết sẽ được render ở đây -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <script>
+    // ===================================================================
+    // DỮ LIỆU GIẢ (MOCK DATA)
+    // ===================================================================
+    const mockTables = [
+        { id: 'B01', name: 'Bàn 1', status: 'available' },
+        { id: 'B02', name: 'Bàn 2', status: 'seated' },
+        { id: 'B03', name: 'Bàn 3', status: 'seated' },
+        { id: 'B04', name: 'Bàn 4', status: 'available' },
+    ];
+
+    const mockDishes = [
+        { id: 'M01', name: 'Phở Bò', price: 50000 },
+        { id: 'M02', name: 'Bún Chả', price: 45000 },
+        { id: 'M03', name: 'Cơm Rang Dưa Bò', price: 55000 },
+        { id: 'M04', name: 'Nem Rán', price: 30000 },
+        { id: 'M05', name: 'Nước ngọt', price: 15000 },
+    ];
+
+    // Nơi lưu trữ tất cả các phiếu gọi món đã xác nhận
+    let confirmedOrders = [];
+    // Nơi lưu trữ tạm thời các món đang được chọn trong modal
+    let pendingOrderItems = [];
+
+    // ===================================================================
+    // CÁC HÀM XỬ LÝ
+    // ===================================================================
+
+    // Hàm render bảng chính
+    function renderConfirmedOrders() {
+        const tbody = document.getElementById('orderTable');
+        tbody.innerHTML = '';
+        confirmedOrders.forEach(order => {
+            const total = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            tbody.innerHTML += `
+                <tr>
+                    <td>PD${order.id}</td>
+                    <td>${order.tableId}</td>
+                    <td>${new Date(order.time).toLocaleString('vi-VN')}</td>
+                    <td>${total.toLocaleString('vi-VN')} VNĐ</td>
+                    <td>
+                        <button class="btn btn-info btn-sm" onclick="viewOrderDetails(${order.id})">Chi tiết</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteOrder(${order.id})">Xóa</button>
+                    </td>
+                </tr>`;
+        });
+    }
+    
+    // Mở modal để tạo phiếu gọi món mới
+    function openNewOrderModal() {
+        // Reset lại danh sách món tạm thời
+        pendingOrderItems = [];
+        renderPendingItems();
+
+        // Đổ dữ liệu bàn và món ăn vào các ô select
+        const tableSelect = document.getElementById('tableSelect');
+        // Điều kiện trước: Chỉ chọn các bàn đã có khách (seated)
+        tableSelect.innerHTML = mockTables.filter(t => t.status === 'seated').map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+        
+        const dishSelect = document.getElementById('dishSelect');
+        dishSelect.innerHTML = mockDishes.map(d => `<option value="${d.id}">${d.name} (${d.price.toLocaleString('vi-VN')} VNĐ)</option>`).join('');
+        
+        $('#orderModal').modal('show');
+    }
+
+    // Thêm một món vào danh sách tạm thời (pending)
+    function addDishToPendingOrder() {
+        const dishId = document.getElementById('dishSelect').value;
+        const quantity = parseInt(document.getElementById('quantityInput').value, 10);
+        
+        if (!dishId || isNaN(quantity) || quantity < 1) {
+            alert('Vui lòng chọn món và số lượng hợp lệ.');
+            return;
+        }
+
+        const dishData = mockDishes.find(d => d.id === dishId);
+        
+        // Kiểm tra xem món đã có trong danh sách tạm chưa
+        const existingItem = pendingOrderItems.find(item => item.id === dishId);
+        if (existingItem) {
+            // Nếu có rồi thì cộng dồn số lượng
+            existingItem.quantity += quantity;
+        } else {
+            // Nếu chưa có thì thêm mới
+            pendingOrderItems.push({ ...dishData, quantity: quantity });
+        }
+        
+        renderPendingItems();
+    }
+
+    // Render lại bảng các món ăn tạm thời trong modal
+    function renderPendingItems() {
+        const tbody = document.getElementById('pendingOrderItems');
+        let total = 0;
+        tbody.innerHTML = '';
+        pendingOrderItems.forEach(item => {
+            const subtotal = item.price * item.quantity;
+            total += subtotal;
+            tbody.innerHTML += `
+                <tr>
+                    <td>${item.name}</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.price.toLocaleString('vi-VN')}</td>
+                    <td>${subtotal.toLocaleString('vi-VN')}</td>
+                    <td><button class="btn btn-danger btn-sm" onclick="removePendingItem('${item.id}')">×</button></td>
+                </tr>`;
+        });
+        document.getElementById('pendingTotal').textContent = total.toLocaleString('vi-VN');
+    }
+    
+    // Xóa một món khỏi danh sách tạm thời
+    function removePendingItem(dishId) {
+        pendingOrderItems = pendingOrderItems.filter(item => item.id !== dishId);
+        renderPendingItems();
+    }
+
+    // Xác nhận và lưu phiếu gọi món
+    function confirmOrder() {
+        const tableId = document.getElementById('tableSelect').value;
+        if (pendingOrderItems.length === 0) {
+            alert('Vui lòng chọn ít nhất một món ăn!');
+            return;
+        }
+
+        const newOrderId = confirmedOrders.length ? Math.max(...confirmedOrders.map(o => o.id)) + 1 : 1;
+        
+        const newOrder = {
+            id: newOrderId,
+            tableId: tableId,
+            time: new Date().toISOString(),
+            items: [...pendingOrderItems] // Tạo một bản sao của mảng
+        };
+
+        confirmedOrders.push(newOrder);
+        renderConfirmedOrders();
+        
+        alert('Gọi món thành công!'); // Hiển thị thông báo thành công
+        $('#orderModal').modal('hide');
+    }
+    
+    // Xem chi tiết một phiếu gọi món đã xác nhận
+    function viewOrderDetails(orderId) {
+        const order = confirmedOrders.find(o => o.id === orderId);
+        if (!order) return;
+        
+        let detailsHtml = `<p><b>Mã phiếu:</b> PD${order.id}</p>`;
+        detailsHtml += `<p><b>Bàn:</b> ${order.tableId}</p>`;
+        detailsHtml += `<p><b>Thời gian:</b> ${new Date(order.time).toLocaleString('vi-VN')}</p>`;
+        detailsHtml += '<table class="table table-bordered"><thead><tr><th>Món</th><th>SL</th><th>Đơn giá</th><th>Thành tiền</th></tr></thead><tbody>';
+        
+        let total = 0;
+        order.items.forEach(item => {
+            const subtotal = item.price * item.quantity;
+            total += subtotal;
+            detailsHtml += `
+                <tr>
+                    <td>${item.name}</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.price.toLocaleString('vi-VN')}</td>
+                    <td>${subtotal.toLocaleString('vi-VN')}</td>
+                </tr>`;
+        });
+
+        detailsHtml += `</tbody><tfoot><tr><th colspan="3" class="text-right">Tổng cộng</th><th>${total.toLocaleString('vi-VN')} VNĐ</th></tr></tfoot></table>`;
+        
+        document.getElementById('orderDetailsBody').innerHTML = detailsHtml;
+        $('#orderDetailsModal').modal('show');
+    }
+
+    // Xóa một phiếu gọi món
+    function deleteOrder(orderId) {
+        if (confirm(`Bạn có chắc muốn xóa phiếu gọi món PD${orderId}?`)) {
+            confirmedOrders = confirmedOrders.filter(o => o.id !== orderId);
+            renderConfirmedOrders();
+        }
+    }
+    
+    // Chạy lần đầu để render bảng
+    renderConfirmedOrders();
+    </script>
+</body>
+</html>

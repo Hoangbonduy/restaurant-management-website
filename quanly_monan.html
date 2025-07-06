@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý món ăn</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body { padding: 20px; }
+        .btn { margin: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Quản lý món ăn</h2>
+        <a href="dashboard.html" class="btn btn-secondary">Quay lại Dashboard</a>
+        <button class="btn btn-success" data-toggle="modal" data-target="#addDishModal">Thêm món ăn</button>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Mã món ăn</th>
+                    <th>Tên món ăn</th>
+                    <th>Ghi chú</th>
+                    <th>Đơn giá</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody id="dishTable"></tbody>
+        </table>
+    </div>
+
+    <!-- Modal thêm món ăn -->
+    <div class="modal fade" id="addDishModal" tabindex="-1" role="dialog" aria-labelledby="addDishModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addDishModalLabel">Thêm món ăn</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addDishForm">
+                        <div class="form-group">
+                            <label for="dishCode">Mã món ăn</label>
+                            <input type="text" class="form-control" id="dishCode" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dishName">Tên món ăn</label>
+                            <input type="text" class="form-control" id="dishName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dishNote">Ghi chú</label>
+                            <textarea class="form-control" id="dishNote" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="dishPrice">Đơn giá</label>
+                            <input type="text" class="form-control" id="dishPrice" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" onclick="addDish()">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Cập nhật món ăn -->
+    <div class="modal fade" id="editDishModal" tabindex="-1" role="dialog" aria-labelledby="editDishModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editDishModalLabel">Cập nhật món ăn</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editDishForm">
+                        <input type="hidden" id="editDishId">
+                        <div class="form-group">
+                            <label for="editDishCode">Mã món ăn</label>
+                            <input type="text" class="form-control" id="editDishCode" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editDishName">Tên món ăn</label>
+                            <input type="text" class="form-control" id="editDishName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editDishNote">Ghi chú</label>
+                            <textarea class="form-control" id="editDishNote" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="editDishPrice">Đơn giá</label>
+                            <input type="text" class="form-control" id="editDishPrice" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" onclick="saveDishEdit()">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        let dishes = [
+            { id: 1, code: 'MA001', name: 'Phở bò', note: 'Phở truyền thống', price: '50000' },
+            { id: 2, code: 'MA002', name: 'Bún chả', note: 'Thịt nướng', price: '40000' }
+        ];
+
+        function renderDishes() {
+            const tableBody = document.getElementById('dishTable');
+            tableBody.innerHTML = '';
+            dishes.forEach(d => {
+                const row = `<tr>
+                    <td>${d.code}</td>
+                    <td>${d.name}</td>
+                    <td>${d.note}</td>
+                    <td>${d.price}</td>
+                    <td>
+                        <button class="btn btn-warning" onclick="editDish(${d.id})">Cập nhật</button>
+                        <button class="btn btn-danger" onclick="deleteDish(${d.id})">Xóa</button>
+                    </td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        function addDish() {
+            const code = document.getElementById('dishCode').value;
+            const name = document.getElementById('dishName').value;
+            const note = document.getElementById('dishNote').value;
+            const price = document.getElementById('dishPrice').value;
+            if (code && name && note && price) {
+                const newId = dishes.length ? dishes[dishes.length - 1].id + 1 : 1;
+                dishes.push({ id: newId, code, name, note, price });
+                renderDishes();
+                $('#addDishModal').modal('hide');
+                document.getElementById('addDishForm').reset();
+            } else {
+                alert('Vui lòng nhập đầy đủ thông tin!');
+            }
+        }
+
+        function editDish(id) {
+            const d = dishes.find(d => d.id === id);
+            document.getElementById('editDishId').value = d.id;
+            document.getElementById('editDishCode').value = d.code;
+            document.getElementById('editDishName').value = d.name;
+            document.getElementById('editDishNote').value = d.note;
+            document.getElementById('editDishPrice').value = d.price;
+            $('#editDishModal').modal('show');
+        }
+
+        function saveDishEdit() {
+            const id = parseInt(document.getElementById('editDishId').value);
+            const code = document.getElementById('editDishCode').value;
+            const name = document.getElementById('editDishName').value;
+            const note = document.getElementById('editDishNote').value;
+            const price = document.getElementById('editDishPrice').value;
+            if (code && name && note && price) {
+                const d = dishes.find(d => d.id === id);
+                d.code = code;
+                d.name = name;
+                d.note = note;
+                d.price = price;
+                renderDishes();
+                $('#editDishModal').modal('hide');
+            } else {
+                alert('Vui lòng nhập đầy đủ thông tin!');
+            }
+        }
+
+        function deleteDish(id) {
+            if (confirm('Bạn có chắc muốn xóa món ăn này?')) {
+                dishes = dishes.filter(d => d.id !== id);
+                renderDishes();
+            }
+        }
+
+        renderDishes();
+    </script>
+</body>
+</html>

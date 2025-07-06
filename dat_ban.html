@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sơ đồ Đặt bàn</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body { padding: 20px; background-color: #f8f9fa; }
+        
+        /* CSS cho khu vực hiển thị sơ đồ bàn */
+        .table-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            background-color: #fff;
+        }
+
+        /* CSS cho từng bàn ăn */
+        .table-item {
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .table-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        /* CSS cho màu sắc trạng thái (theo UC) */
+        .table-available {
+            background-color: #28a745; /* Màu xanh lá: Bàn trống */
+        }
+        .table-booked {
+            background-color: #6c757d; /* Màu xám: Bàn đã đặt */
+        }
+
+        /* Chú thích màu sắc */
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="mb-4">Sơ đồ Bàn ăn</h2>
+        <a href="dashboard.html" class="btn btn-secondary mb-3"><i class="fas fa-arrow-left"></i> Quay lại Dashboard</a>
+        
+        <!-- BƯỚC 1: HỆ THỐNG HIỂN THỊ SƠ ĐỒ BÀN NHÀ HÀNG -->
+        <div class="table-layout" id="table-map">
+            <!-- Các bàn ăn sẽ được JS render vào đây -->
+        </div>
+
+        <!-- Chú thích -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color table-available"></div>
+                <span>Bàn trống (Có thể đặt)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color table-booked"></div>
+                <span>Bàn đã được đặt</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL ĐỂ ĐIỀN THÔNG TIN KHÁCH HÀNG -->
+    <div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bookingModalLabel">Đặt bàn - Thông tin khách hàng</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="bookingForm">
+                        <!-- Input ẩn để lưu ID của bàn đang được chọn -->
+                        <input type="hidden" id="selectedTableId">
+                        <div class="form-group">
+                            <label for="customerName">Tên khách hàng <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="customerName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customerPhone">Số điện thoại <span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control" id="customerPhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="bookingTime">Thời gian đặt</label>
+                            <input type="datetime-local" class="form-control" id="bookingTime">
+                        </div>
+                        <div class="form-group">
+                            <label for="numberOfGuests">Số lượng khách</label>
+                            <input type="number" class="form-control" id="numberOfGuests" min="1" value="1">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                    <!-- BƯỚC 3: NHẤN "XÁC NHẬN ĐẶT BÀN" -->
+                    <button type="button" class="btn btn-primary" onclick="confirmBooking()">Xác nhận đặt bàn</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <script>
+    // --- DỮ LIỆU GIẢ (MOCK DATA) ---
+    let tables = [
+        { id: 1, name: 'Bàn 1', status: 'available', customerInfo: null },
+        { id: 2, name: 'Bàn 2', status: 'booked', customerInfo: { name: 'Trần Văn B', phone: '0987654321' } },
+        { id: 3, name: 'Bàn 3', status: 'available', customerInfo: null },
+        { id: 4, name: 'Bàn 4', status: 'available', customerInfo: null },
+        { id: 5, name: 'Bàn 5', status: 'booked', customerInfo: { name: 'Lê Thị C', phone: '0123456789' } },
+        { id: 6, name: 'Bàn 6', status: 'available', customerInfo: null },
+        { id: 7, name: 'Bàn 7', status: 'available', customerInfo: null },
+        { id: 8, name: 'Bàn 8', status: 'available', customerInfo: null },
+    ];
+
+    let bookingTimeout;
+
+    // --- HÀM RENDER GIAO DIỆN ---
+    function renderTables() {
+        const tableMap = document.getElementById('table-map');
+        tableMap.innerHTML = ''; 
+
+        tables.forEach(table => {
+            const tableDiv = document.createElement('div');
+            const statusClass = table.status === 'available' ? 'table-available' : 'table-booked';
+            tableDiv.className = `table-item ${statusClass}`;
+            tableDiv.textContent = table.name;
+            tableDiv.dataset.tableId = table.id;
+            tableDiv.addEventListener('click', handleTableClick);
+            tableMap.appendChild(tableDiv);
+        });
+    }
+
+    // --- HÀM XỬ LÝ SỰ KIỆN ---
+
+    // === THAY ĐỔI CHÍNH NẰM Ở HÀM NÀY ===
+    // Hàm được gọi khi người dùng click vào một bàn
+    function handleTableClick(event) {
+        const tableId = parseInt(event.currentTarget.dataset.tableId);
+        const table = tables.find(t => t.id === tableId);
+
+        if (table.status === 'booked') {
+            // THAY ĐỔI: Thêm chức năng hủy bàn
+            // Thay vì chỉ thông báo, giờ đây sẽ hiện một hộp thoại xác nhận.
+            const confirmationMessage = `Bàn này đã được đặt bởi khách hàng ${table.customerInfo.name}.\n\nBạn có muốn HỦY ĐẶT BÀN này không?`;
+            
+            if (confirm(confirmationMessage)) {
+                // Nếu người dùng đồng ý hủy
+                cancelBooking(tableId);
+            }
+            // Nếu người dùng không đồng ý (nhấn Cancel), không làm gì cả.
+
+        } else {
+            // Luồng đặt bàn như cũ
+            openBookingModal(tableId);
+        }
+    }
+
+    // === THÊM HÀM MỚI ĐỂ XỬ LÝ VIỆC HỦY BÀN ===
+    function cancelBooking(tableId) {
+        const table = tables.find(t => t.id === tableId);
+        if (table) {
+            // Chuyển trạng thái bàn về 'trống'
+            table.status = 'available';
+            // Xóa thông tin khách hàng đã đặt
+            table.customerInfo = null;
+
+            // Thông báo thành công
+            alert('Hủy đặt bàn thành công!');
+
+            // Vẽ lại sơ đồ bàn để cập nhật giao diện
+            renderTables();
+        }
+    }
+
+
+    // Mở modal để nhập thông tin khách hàng (không thay đổi)
+    function openBookingModal(tableId) {
+        document.getElementById('bookingForm').reset();
+        document.getElementById('selectedTableId').value = tableId;
+        const tableName = tables.find(t => t.id === tableId).name;
+        document.getElementById('bookingModalLabel').textContent = `Đặt ${tableName} - Thông tin khách hàng`;
+        $('#bookingModal').modal('show');
+        
+        clearTimeout(bookingTimeout);
+        bookingTimeout = setTimeout(() => {
+            if ($('#bookingModal').is(':visible')) {
+                $('#bookingModal').modal('hide');
+                alert('Phiên đặt bàn đã hết hạn. Vui lòng thử lại.');
+            }
+        }, 100000);
+    }
+
+    // Xác nhận đặt bàn (không thay đổi)
+    function confirmBooking() {
+        const tableId = parseInt(document.getElementById('selectedTableId').value);
+        const customerName = document.getElementById('customerName').value;
+        const customerPhone = document.getElementById('customerPhone').value;
+
+        if (!customerName || !customerPhone) {
+            alert('Vui lòng điền đầy đủ thông tin bắt buộc (Tên và Số điện thoại).');
+            return;
+        }
+        
+        clearTimeout(bookingTimeout);
+        
+        const table = tables.find(t => t.id === tableId);
+        if (table) {
+            table.status = 'booked';
+            table.customerInfo = {
+                name: customerName,
+                phone: customerPhone,
+                time: document.getElementById('bookingTime').value,
+                guests: document.getElementById('numberOfGuests').value
+            };
+            alert('Đặt bàn thành công!');
+            renderTables();
+            $('#bookingModal').modal('hide');
+        }
+    }
+
+    // --- KHỞI CHẠY LẦN ĐẦU ---
+    document.addEventListener('DOMContentLoaded', renderTables);
+</script>
+</body>
+</html>

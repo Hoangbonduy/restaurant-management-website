@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Báo cáo Doanh thu</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style> body { padding: 20px; } .btn { margin: 5px; } canvas { max-width: 100%; } </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Báo cáo Doanh thu</h2>
+    <a href="dashboard.html" class="btn btn-secondary">Quay lại Dashboard</a>
+    <canvas id="revenueChart" height="100"></canvas>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const ctx1 = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctx1, {
+      type: 'line',
+      data: {
+        labels: ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6'],
+        datasets: [{
+          label: 'Doanh thu (triệu VND)',
+          data: [120, 150, 170, 130, 190, 200],
+          fill: false,
+          tension: 0.1
+        }]
+      },
+      options: { responsive: true }
+    });
+  </script>
+</body>
+</html>

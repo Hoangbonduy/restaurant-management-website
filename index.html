@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login & Register</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1 class="main-title">QUẢN LÝ NHÀ HÀNG</h1>
+
+    <div id="tabs-container" class="tabs">
+      <button id="login-tab" class="active">Login</button>
+      <button id="register-tab">Register</button>
+    </div>
+
+    <!-- === FORM ĐĂNG NHẬP === -->
+    <form id="login-form" class="form active">
+      <h2>Login</h2>
+      <div class="form-group">
+        <label for="login-username">Username</label>
+        <input type="text" id="login-username" required />
+      </div>
+      <div class="form-group">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" required />
+      </div>
+      <div class="form-extra">
+        <!-- SỬA Ở ĐÂY: Thêm id="forgot-password-link" -->
+        <a href="#" id="forgot-password-link" class="forgot-password">Quên mật khẩu?</a>
+      </div>
+      <button type="submit">Login</button>
+    </form>
+
+    <!-- === FORM ĐĂNG KÝ === -->
+    <form id="register-form" class="form">
+            <h2>Register</h2>
+            <div class="form-group">
+                <label for="reg-username">Username</label>
+                <input type="text" id="reg-username" required />
+            </div>
+            <div class="form-group">
+                <label for="reg-password">Password</label>
+                <input type="password" id="reg-password" required />
+            </div>
+            <!-- Thêm trường Số điện thoại -->
+            <div class="form-group">
+                <label for="reg-phone">Số điện thoại</label>
+                <input type="tel" id="reg-phone" required placeholder="Dùng để nhận OTP" />
+            </div>
+            <!-- Thêm lựa chọn Vai trò -->
+            <div class="form-group">
+                <label for="reg-role">Bạn là?</label>
+                <select id="reg-role" class="form-control">
+                    <option value="customer">Khách hàng</option>
+                    <option value="employee">Nhân viên</option>
+                </select>
+            </div>
+            <button type="submit">Đăng ký</button>
+    </form>
+    
+    <!-- === CÁC FORM QUÊN MẬT KHẨU (Đúng vị trí trong container) === -->
+    <!-- Bước 1: Yêu cầu OTP -->
+    <form id="request-otp-form" class="form">
+      <h2>Quên Mật Khẩu</h2>
+      <p class="form-instruction">Vui lòng nhập số điện thoại của bạn để nhận mã OTP.</p>
+      <div class="form-group">
+        <label for="forgot-phone-number">Số điện thoại</label>
+        <input type="text" id="forgot-phone-number" required />
+      </div>
+      <button type="submit">Gửi mã OTP</button>
+      <a href="#" class="back-to-login">Quay lại Đăng nhập</a>
+    </form>
+
+    <!-- Bước 2: Xác thực OTP -->
+    <form id="verify-otp-form" class="form">
+      <h2>Xác Thực OTP</h2>
+      <p class="form-instruction">Một mã OTP (gồm 6 chữ số) đã được gửi. Vui lòng kiểm tra và nhập vào bên dưới.</p>
+      <div class="form-group">
+        <label for="otp-code">Mã OTP</label>
+        <input type="text" id="otp-code" required maxlength="6" />
+      </div>
+      <button type="submit">Xác nhận</button>
+      <a href="#" class="back-to-login">Quay lại Đăng nhập</a>
+    </form>
+
+    <!-- Bước 3: Đặt lại mật khẩu -->
+    <form id="reset-password-form" class="form">
+        <h2>Tạo Mật Khẩu Mới</h2>
+        <div class="form-group">
+            <label for="new-password">Mật khẩu mới</label>
+            <input type="password" id="new-password" required />
+        </div>
+        <div class="form-group">
+            <label for="confirm-password">Xác nhận mật khẩu mới</label>
+            <input type="password" id="confirm-password" required />
+        </div>
+        <button type="submit">Lưu mật khẩu</button>
+    </form>
+    
+  </div> <!-- Kết thúc div.container -->
+
+  <script src="js/script.js"></script>
+</body>
+</html>

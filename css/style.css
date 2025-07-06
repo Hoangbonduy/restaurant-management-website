@@ -1,0 +1,222 @@
+/* CSS cập nhật */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f8f9fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  
+  .container {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    width: 100%;
+    max-width: 400px;
+    margin: 20px;
+  }
+  
+  .main-title {
+    text-align: center;
+    margin: 0 0 2rem 0;
+    color: #2c3e50;
+    font-size: 1.8rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    position: relative;
+    padding-bottom: 0.5rem;
+  }
+  
+  .main-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: #6A3C8D;
+  }
+  
+  .tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 2rem;
+  }
+  
+  .tabs button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: #f1f5f9;
+    color: #64748b;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .tabs button.active {
+    background: #6A3C8D;
+    color: white;
+    box-shadow: 0 4px 6px rgba(52, 152, 219, 0.2);
+  }
+  
+  .tabs button:hover {
+    background: #e2e8f0;
+  }
+  
+  .form {
+    display: none;
+  }
+  
+  .form.active {
+    display: block;
+  }
+  
+  .form h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
+    font-size: 1.5rem;
+    font-weight: 500;
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #475569;
+    font-size: 0.9rem;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+  }
+  
+  .form-group input:focus {
+    outline: none;
+    border-color: #6A3C8D;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  }
+  
+  button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    background: #6A3C8D;
+    color: white;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  button[type="submit"]:hover {
+    background: #6A3C8D;
+    box-shadow: 0 4px 6px rgba(52, 152, 219, 0.2);
+  }
+
+  .form-extra {
+    text-align: left;       /* Căn lề trái cho link, giống trong hình mẫu */
+    margin-top: -1rem;      /* Kéo lên một chút để gần ô mật khẩu hơn */
+    margin-bottom: 1.5rem;  /* Tạo khoảng cách với nút Login bên dưới, bằng với các form-group khác */
+  }
+
+  /* Định dạng cho chính link "Quên mật khẩu?" */
+  .forgot-password {
+    font-size: 0.9rem;      /* Cỡ chữ tương đồng với label */
+    color: #007bff;        /* Màu xanh dương tiêu chuẩn cho link, dễ nhận biết */
+    text-decoration: none;  /* Bỏ gạch chân mặc định */
+    font-weight: 500;
+  } 
+
+  .forgot-password:hover {
+    text-decoration: underline; /* Thêm lại gạch chân khi người dùng di chuột qua */
+  }
+
+    /* === BỔ SUNG CSS CHO PHẦN "QUÊN MẬT KHẨU" === */
+  .form-extra {
+    text-align: left;
+    margin-top: -1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .forgot-password {
+    font-size: 0.9rem;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .forgot-password:hover {
+    text-decoration: underline;
+  }
+
+  /* Style cho các đoạn văn bản hướng dẫn */
+  .form-instruction {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #64748b;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  /* Style cho link "Quay lại Đăng nhập" */
+  .back-to-login {
+    display: block;
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: #64748b;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .back-to-login:hover {
+    color: #6A3C8D;
+    text-decoration: underline;
+  }
+
+  .form-group select.form-control {
+  /* Các thuộc tính này đảm bảo nó trông giống ô input */
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+  
+  /* 1. Loại bỏ giao diện mặc định của trình duyệt */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  
+  /* 2. Thêm mũi tên tùy chỉnh của riêng bạn */
+  /* Tôi đã dùng một SVG gọn nhẹ để làm mũi tên */
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+  
+  /* 3. Thêm khoảng trống bên phải để chữ không bị đè lên mũi tên */
+  padding-right: 2.5rem; 
+}
+
+/* Định dạng khi focus vào ô select */
+.form-group select.form-control:focus {
+  outline: none;
+  border-color: #6A3C8D;
+  box-shadow: 0 0 0 3px rgba(106, 60, 141, 0.15);
+}

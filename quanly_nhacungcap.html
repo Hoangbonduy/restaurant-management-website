@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý nhà cung cấp</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body { padding: 20px; }
+        .btn { margin: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Quản lý nhà cung cấp</h2>
+        <a href="dashboard.html" class="btn btn-secondary">Quay lại Dashboard</a>
+        <button class="btn btn-success" data-toggle="modal" data-target="#addSupplierModal">Thêm nhà cung cấp</button>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Mã nhà cung cấp</th>
+                    <th>Tên nhà cung cấp</th>
+                    <th>Địa chỉ nhà cung cấp</th>
+                    <th>Số điện thoại</th>
+                    <th>Tên người đại diện</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody id="supplierTable"></tbody>
+        </table>
+    </div>
+
+    <!-- Modal thêm nhà cung cấp -->
+    <div class="modal fade" id="addSupplierModal" tabindex="-1" role="dialog" aria-labelledby="addSupplierModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addSupplierModalLabel">Thêm nhà cung cấp</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addSupplierForm">
+                        <div class="form-group">
+                            <label for="supplierCode">Mã nhà cung cấp</label>
+                            <input type="text" class="form-control" id="supplierCode" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="supplierName">Tên nhà cung cấp</label>
+                            <input type="text" class="form-control" id="supplierName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="supplierAddress">Địa chỉ nhà cung cấp</label>
+                            <input type="text" class="form-control" id="supplierAddress" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="supplierPhone">Số điện thoại</label>
+                            <input type="text" class="form-control" id="supplierPhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="supplierRep">Tên người đại diện</label>
+                            <input type="text" class="form-control" id="supplierRep" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" onclick="addSupplier()">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Cập nhật nhà cung cấp -->
+    <div class="modal fade" id="editSupplierModal" tabindex="-1" role="dialog" aria-labelledby="editSupplierModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editSupplierModalLabel">Cập nhật nhà cung cấp</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editSupplierForm">
+                        <input type="hidden" id="editSupplierId">
+                        <div class="form-group">
+                            <label for="editSupplierCode">Mã nhà cung cấp</label>
+                            <input type="text" class="form-control" id="editSupplierCode" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editSupplierName">Tên nhà cung cấp</label>
+                            <input type="text" class="form-control" id="editSupplierName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editSupplierAddress">Địa chỉ nhà cung cấp</label>
+                            <input type="text" class="form-control" id="editSupplierAddress" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editSupplierPhone">Số điện thoại</label>
+                            <input type="text" class="form-control" id="editSupplierPhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editSupplierRep">Tên người đại diện</label>
+                            <input type="text" class="form-control" id="editSupplierRep" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" onclick="saveSupplierEdit()">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        let suppliers = [
+            { id: 1, code: 'NCC001', name: 'Công ty A', address: '789 Đường DEF, Đà Nẵng', phone: '0123456789', rep: 'Nguyễn Văn X' },
+            { id: 2, code: 'NCC002', name: 'Công ty B', address: '101 Đường GHI, TP. HCM', phone: '0987654321', rep: 'Trần Thị Y' }
+        ];
+
+        function renderSuppliers() {
+            const tableBody = document.getElementById('supplierTable');
+            tableBody.innerHTML = '';
+            suppliers.forEach(s => {
+                const row = `<tr>
+                    <td>${s.code}</td>
+                    <td>${s.name}</td>
+                    <td>${s.address}</td>
+                    <td>${s.phone}</td>
+                    <td>${s.rep}</td>
+                    <td>
+                        <button class="btn btn-warning" onclick="editSupplier(${s.id})">Cập nhật</button>
+                        <button class="btn btn-danger" onclick="deleteSupplier(${s.id})">Xóa</button>
+                    </td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        function addSupplier() {
+            const code = document.getElementById('supplierCode').value;
+            const name = document.getElementById('supplierName').value;
+            const address = document.getElementById('supplierAddress').value;
+            const phone = document.getElementById('supplierPhone').value;
+            const rep = document.getElementById('supplierRep').value;
+            if (code && name && address && phone && rep) {
+                const newId = suppliers.length ? suppliers[suppliers.length - 1].id + 1 : 1;
+                suppliers.push({ id: newId, code, name, address, phone, rep });
+                renderSuppliers();
+                $('#addSupplierModal').modal('hide');
+                document.getElementById('addSupplierForm').reset();
+            } else {
+                alert('Vui lòng nhập đầy đủ thông tin!');
+            }
+        }
+
+        function editSupplier(id) {
+            const s = suppliers.find(s => s.id === id);
+            document.getElementById('editSupplierId').value = s.id;
+            document.getElementById('editSupplierCode').value = s.code;
+            document.getElementById('editSupplierName').value = s.name;
+            document.getElementById('editSupplierAddress').value = s.address;
+            document.getElementById('editSupplierPhone').value = s.phone;
+            document.getElementById('editSupplierRep').value = s.rep;
+            $('#editSupplierModal').modal('show');
+        }
+
+        function saveSupplierEdit() {
+            const id = parseInt(document.getElementById('editSupplierId').value);
+            const code = document.getElementById('editSupplierCode').value;
+            const name = document.getElementById('editSupplierName').value;
+            const address = document.getElementById('editSupplierAddress').value;
+            const phone = document.getElementById('editSupplierPhone').value;
+            const rep = document.getElementById('editSupplierRep').value;
+            if (code && name && address && phone && rep) {
+                const s = suppliers.find(s => s.id === id);
+                s.code = code;
+                s.name = name;
+                s.address = address;
+                s.phone = phone;
+                s.rep = rep;
+                renderSuppliers();
+                $('#editSupplierModal').modal('hide');
+            } else {
+                alert('Vui lòng nhập đầy đủ thông tin!');
+            }
+        }
+
+        function deleteSupplier(id) {
+            if (confirm('Bạn có chắc muốn xóa nhà cung cấp này?')) {
+                suppliers = suppliers.filter(s => s.id !== id);
+                renderSuppliers();
+            }
+        }
+
+        renderSuppliers();
+    </script>
+</body>
+</html>

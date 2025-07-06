@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Báo cáo Chi phí nguyên liệu</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style> body { padding: 20px; } .btn { margin: 5px; } canvas { max-width: 100%; } </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Báo cáo Chi phí nguyên liệu</h2>
+    <a href="dashboard.html" class="btn btn-secondary">Quay lại Dashboard</a>
+    <canvas id="costChart" height="100"></canvas>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const ctx2 = document.getElementById('costChart').getContext('2d');
+    new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: ['Thịt bò','Bún','Rau','Gia vị','Khác'],
+        datasets: [{
+          label: 'Chi phí (triệu VND)',
+          data: [50, 20, 10, 5, 8]
+        }]
+      },
+      options: { responsive: true }
+    });
+  </script>
+</body>
+</html>

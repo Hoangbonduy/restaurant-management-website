@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý khách hàng</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body { padding: 20px; }
+        .btn { margin: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Quản lý khách hàng</h2>
+        <!-- Nút quay lại Dashboard -->
+        <a href="dashboard.html" class="btn btn-secondary">Quay lại Dashboard</a>
+        <!-- Nút Thêm khách hàng -->
+        <button class="btn btn-success" data-toggle="modal" data-target="#addCustomerModal">Thêm khách hàng</button>
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Mã khách hàng</th>
+                    <th>Tên khách hàng</th>
+                    <th>Ngày sinh</th>
+                    <th>Số điện thoại</th>
+                    <th>Điểm tích lũy</th>
+                    <th>Khách hàng thân thiết</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody id="customerTable"></tbody>
+        </table>
+    </div>
+
+    <!-- Modal thêm khách hàng -->
+    <div class="modal fade" id="addCustomerModal" tabindex="-1" role="dialog" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCustomerModalLabel">Thêm khách hàng</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addCustomerForm">
+                        <div class="form-group">
+                            <label for="customerCode">Mã khách hàng</label>
+                            <input type="text" class="form-control" id="customerCode" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customerName">Tên khách hàng</label>
+                            <input type="text" class="form-control" id="customerName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customerDob">Ngày sinh</label>
+                            <input type="date" class="form-control" id="customerDob" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customerPhone">Số điện thoại</label>
+                            <input type="text" class="form-control" id="customerPhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customerPoints">Điểm tích lũy</label>
+                            <input type="number" class="form-control" id="customerPoints" value="0" min="0" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" onclick="addCustomer()">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal sửa khách hàng -->
+    <div class="modal fade" id="editCustomerModal" tabindex="-1" role="dialog" aria-labelledby="editCustomerModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCustomerModalLabel">Sửa khách hàng</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editCustomerForm">
+                        <input type="hidden" id="editCustomerId">
+                        <div class="form-group">
+                            <label for="editCustomerCode">Mã khách hàng</label>
+                            <input type="text" class="form-control" id="editCustomerCode" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editCustomerName">Tên khách hàng</label>
+                            <input type="text" class="form-control" id="editCustomerName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editCustomerDob">Ngày sinh</label>
+                            <input type="date" class="form-control" id="editCustomerDob" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editCustomerPhone">Số điện thoại</label>
+                            <input type="text" class="form-control" id="editCustomerPhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editCustomerPoints">Điểm tích lũy</label>
+                            <input type="number" class="form-control" id="editCustomerPoints" min="0" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" onclick="saveCustomerEdit()">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Ngưỡng điểm để trở thành khách hàng thân thiết
+        const LOYALTY_THRESHOLD = 1000;
+
+        // Mảng quản lý khách hàng
+        let customers = [
+            { id: 1, code: 'KH001', name: 'Nguyễn Thị C', dob: '1985-06-15', phone: '0123456789', points: 200 },
+            { id: 2, code: 'KH002', name: 'Lê Văn D', dob: '1990-12-20', phone: '0987654321', points: 1200 }
+        ];
+
+        // Hàm render danh sách khách hàng
+        function renderCustomers() {
+            const tableBody = document.getElementById('customerTable');
+            tableBody.innerHTML = '';
+            customers.forEach(c => {
+                const isLoyal = c.points >= LOYALTY_THRESHOLD;
+                const row = `
+                <tr>
+                    <td>${c.code}</td>
+                    <td>${c.name}</td>
+                    <td>${c.dob}</td>
+                    <td>${c.phone}</td>
+                    <td>${c.points}</td>
+                    <td>${isLoyal ? 'Có' : 'Không'}</td>
+                    <td>
+                        <button class="btn btn-warning" onclick="editCustomer(${c.id})">Sửa</button>
+                        <button class="btn btn-danger" onclick="deleteCustomer(${c.id})">Xóa</button>
+                    </td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        // Thêm khách hàng
+        function addCustomer() {
+            const code = document.getElementById('customerCode').value;
+            const name = document.getElementById('customerName').value;
+            const dob = document.getElementById('customerDob').value;
+            const phone = document.getElementById('customerPhone').value;
+            const points = parseInt(document.getElementById('customerPoints').value) || 0;
+            if (code && name && dob && phone) {
+                const newId = customers.length ? customers[customers.length - 1].id + 1 : 1;
+                customers.push({ id: newId, code, name, dob, phone, points });
+                renderCustomers();
+                $('#addCustomerModal').modal('hide');
+                document.getElementById('addCustomerForm').reset();
+            } else {
+                alert('Vui lòng nhập đầy đủ thông tin!');
+            }
+        }
+
+        // Chỉnh sửa khách hàng
+        function editCustomer(id) {
+            const c = customers.find(c => c.id === id);
+            document.getElementById('editCustomerId').value = c.id;
+            document.getElementById('editCustomerCode').value = c.code;
+            document.getElementById('editCustomerName').value = c.name;
+            document.getElementById('editCustomerDob').value = c.dob;
+            document.getElementById('editCustomerPhone').value = c.phone;
+            document.getElementById('editCustomerPoints').value = c.points;
+            $('#editCustomerModal').modal('show');
+        }
+
+        // Lưu chỉnh sửa
+        function saveCustomerEdit() {
+            const id = parseInt(document.getElementById('editCustomerId').value);
+            const code = document.getElementById('editCustomerCode').value;
+            const name = document.getElementById('editCustomerName').value;
+            const dob = document.getElementById('editCustomerDob').value;
+            const phone = document.getElementById('editCustomerPhone').value;
+            const points = parseInt(document.getElementById('editCustomerPoints').value) || 0;
+            if (code && name && dob && phone) {
+                const c = customers.find(c => c.id === id);
+                c.code = code;
+                c.name = name;
+                c.dob = dob;
+                c.phone = phone;
+                c.points = points;
+                renderCustomers();
+                $('#editCustomerModal').modal('hide');
+            } else {
+                alert('Vui lòng nhập đầy đủ thông tin!');
+            }
+        }
+
+        // Xóa khách hàng
+        function deleteCustomer(id) {
+            if (confirm('Bạn có chắc muốn xóa khách hàng này?')) {
+                customers = customers.filter(c => c.id !== id);
+                renderCustomers();
+            }
+        }
+
+        // Khởi tạo hiển thị
+        renderCustomers();
+    </script>
+</body>
+</html>

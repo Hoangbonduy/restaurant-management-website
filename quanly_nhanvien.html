@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý nhân viên</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body { padding: 20px; }
+        .btn { margin: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Quản lý nhân viên</h2>
+        <a href="dashboard.html" class="btn btn-secondary">Quay lại Dashboard</a>
+        <button class="btn btn-success" data-toggle="modal" data-target="#addEmployeeModal">Thêm nhân viên</button>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Mã nhân viên</th>
+                    <th>Tên nhân viên</th>
+                    <th>Mã chi nhánh</th>
+                    <th>Ngày sinh</th>
+                    <th>Giới tính</th>
+                    <th>Số điện thoại</th>
+                    <th>Địa chỉ</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody id="employeeTable"></tbody>
+        </table>
+    </div>
+
+    <!-- Modal thêm nhân viên -->
+    <div class="modal fade" id="addEmployeeModal" tabindex="-1" role="dialog" aria-labelledby="addEmployeeModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addEmployeeModalLabel">Thêm nhân viên</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addEmployeeForm">
+                        <div class="form-group">
+                            <label for="employeeCode">Mã nhân viên</label>
+                            <input type="text" class="form-control" id="employeeCode" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="employeeName">Tên nhân viên</label>
+                            <input type="text" class="form-control" id="employeeName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="branchCode">Mã chi nhánh</label>
+                            <input type="text" class="form-control" id="branchCode" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="employeeDob">Ngày sinh</label>
+                            <input type="date" class="form-control" id="employeeDob" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="employeeGender">Giới tính</label>
+                            <select class="form-control" id="employeeGender" required>
+                                <option value="Nam">Nam</option>
+                                <option value="Nữ">Nữ</option>
+                                <option value="Khác">Khác</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="employeePhone">Số điện thoại</label>
+                            <input type="text" class="form-control" id="employeePhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="employeeAddress">Địa chỉ</label>
+                            <input type="text" class="form-control" id="employeeAddress" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" onclick="addEmployee()">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Cập nhật nhân viên -->
+    <div class="modal fade" id="editEmployeeModal" tabindex="-1" role="dialog" aria-labelledby="editEmployeeModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editEmployeeModalLabel">Cập nhật nhân viên</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editEmployeeForm">
+                        <input type="hidden" id="editEmployeeId">
+                        <div class="form-group">
+                            <label for="editEmployeeCode">Mã nhân viên</label>
+                            <input type="text" class="form-control" id="editEmployeeCode" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editEmployeeName">Tên nhân viên</label>
+                            <input type="text" class="form-control" id="editEmployeeName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editBranchCode">Mã chi nhánh</label>
+                            <input type="text" class="form-control" id="editBranchCode" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editEmployeeDob">Ngày sinh</label>
+                            <input type="date" class="form-control" id="editEmployeeDob" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editEmployeeGender">Giới tính</label>
+                            <select class="form-control" id="editEmployeeGender" required>
+                                <option value="Nam">Nam</option>
+                                <option value="Nữ">Nữ</option>
+                                <option value="Khác">Khác</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editEmployeePhone">Số điện thoại</label>
+                            <input type="text" class="form-control" id="editEmployeePhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editEmployeeAddress">Địa chỉ</label>
+                            <input type="text" class="form-control" id="editEmployeeAddress" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" onclick="saveEmployeeEdit()">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        let employees = [
+            { id: 1, code: 'NV001', name: 'Nguyễn Văn A', branch: 'CN001', dob: '1990-01-01', gender: 'Nam', phone: '0123456789', address: '123 Đường ABC, TP. HCM' },
+            { id: 2, code: 'NV002', name: 'Trần Thị B', branch: 'CN002', dob: '1992-05-15', gender: 'Nữ', phone: '0987654321', address: '456 Đường XYZ, Hà Nội' }
+        ];
+
+        function renderEmployees() {
+            const tableBody = document.getElementById('employeeTable');
+            tableBody.innerHTML = '';
+            employees.forEach(emp => {
+                const row = `<tr>
+                    <td>${emp.code}</td>
+                    <td>${emp.name}</td>
+                    <td>${emp.branch}</td>
+                    <td>${emp.dob}</td>
+                    <td>${emp.gender}</td>
+                    <td>${emp.phone}</td>
+                    <td>${emp.address}</td>
+                    <td>
+                        <button class="btn btn-warning" onclick="editEmployee(${emp.id})">Cập nhật</button>
+                        <button class="btn btn-danger" onclick="deleteEmployee(${emp.id})">Xóa</button>
+                    </td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        function addEmployee() {
+            const code = document.getElementById('employeeCode').value;
+            const name = document.getElementById('employeeName').value;
+            const branch = document.getElementById('branchCode').value;
+            const dob = document.getElementById('employeeDob').value;
+            const gender = document.getElementById('employeeGender').value;
+            const phone = document.getElementById('employeePhone').value;
+            const address = document.getElementById('employeeAddress').value;
+            if (code && name && branch && dob && gender && phone && address) {
+                const newId = employees.length ? employees[employees.length - 1].id + 1 : 1;
+                employees.push({ id: newId, code, name, branch, dob, gender, phone, address });
+                renderEmployees();
+                $('#addEmployeeModal').modal('hide');
+                document.getElementById('addEmployeeForm').reset();
+            } else {
+                alert('Vui lòng nhập đầy đủ thông tin!');
+            }
+        }
+
+        function editEmployee(id) {
+            const emp = employees.find(e => e.id === id);
+            document.getElementById('editEmployeeId').value = emp.id;
+            document.getElementById('editEmployeeCode').value = emp.code;
+            document.getElementById('editEmployeeName').value = emp.name;
+            document.getElementById('editBranchCode').value = emp.branch;
+            document.getElementById('editEmployeeDob').value = emp.dob;
+            document.getElementById('editEmployeeGender').value = emp.gender;
+            document.getElementById('editEmployeePhone').value = emp.phone;
+            document.getElementById('editEmployeeAddress').value = emp.address;
+            $('#editEmployeeModal').modal('show');
+        }
+
+        function saveEmployeeEdit() {
+            const id = parseInt(document.getElementById('editEmployeeId').value);
+            const code = document.getElementById('editEmployeeCode').value;
+            const name = document.getElementById('editEmployeeName').value;
+            const branch = document.getElementById('editBranchCode').value;
+            const dob = document.getElementById('editEmployeeDob').value;
+            const gender = document.getElementById('editEmployeeGender').value;
+            const phone = document.getElementById('editEmployeePhone').value;
+            const address = document.getElementById('editEmployeeAddress').value;
+            if (code && name && branch && dob && gender && phone && address) {
+                const emp = employees.find(e => e.id === id);
+                emp.code = code;
+                emp.name = name;
+                emp.branch = branch;
+                emp.dob = dob;
+                emp.gender = gender;
+                emp.phone = phone;
+                emp.address = address;
+                renderEmployees();
+                $('#editEmployeeModal').modal('hide');
+            } else {
+                alert('Vui lòng nhập đầy đủ thông tin!');
+            }
+        }
+
+        function deleteEmployee(id) {
+            if (confirm('Bạn có chắc muốn xóa nhân viên này?')) {
+                employees = employees.filter(e => e.id !== id);
+                renderEmployees();
+            }
+        }
+
+        renderEmployees();
+    </script>
+</body>
+</html>

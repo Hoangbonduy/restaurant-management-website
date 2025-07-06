@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý chi nhánh</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body { padding: 20px; }
+        .btn { margin: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Quản lý chi nhánh</h2>
+        <a href="dashboard.html" class="btn btn-secondary">Quay lại Dashboard</a>
+        <button class="btn btn-success" data-toggle="modal" data-target="#addBranchModal">Thêm chi nhánh</button>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Mã chi nhánh</th>
+                    <th>Tên chi nhánh</th>
+                    <th>Địa chỉ</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody id="branchTable"></tbody>
+        </table>
+    </div>
+
+    <!-- Modal thêm chi nhánh -->
+    <div class="modal fade" id="addBranchModal" tabindex="-1" role="dialog" aria-labelledby="addBranchModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addBranchModalLabel">Thêm chi nhánh</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addBranchForm">
+                        <div class="form-group">
+                            <label for="branchCode">Mã chi nhánh</label>
+                            <input type="text" class="form-control" id="branchCode" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="branchName">Tên chi nhánh</label>
+                            <input type="text" class="form-control" id="branchName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="branchAddress">Địa chỉ</label>
+                            <input type="text" class="form-control" id="branchAddress" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" onclick="addBranch()">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal sửa chi nhánh -->
+    <div class="modal fade" id="editBranchModal" tabindex="-1" role="dialog" aria-labelledby="editBranchModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editBranchModalLabel">Cập nhật chi nhánh</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editBranchForm">
+                        <input type="hidden" id="editBranchId">
+                        <div class="form-group">
+                            <label for="editBranchCode">Mã chi nhánh</label>
+                            <input type="text" class="form-control" id="editBranchCode" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editBranchName">Tên chi nhánh</label>
+                            <input type="text" class="form-control" id="editBranchName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editBranchAddress">Địa chỉ</label>
+                            <input type="text" class="form-control" id="editBranchAddress" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" onclick="saveBranchEdit()">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        let branches = [
+            { id: 1, code: 'CN001', name: 'Chi nhánh 1', address: '123 Đường ABC, TP. HCM' },
+            { id: 2, code: 'CN002', name: 'Chi nhánh 2', address: '456 Đường XYZ, Hà Nội' }
+        ];
+
+        function renderBranches() {
+            const tableBody = document.getElementById('branchTable');
+            tableBody.innerHTML = '';
+            branches.forEach(branch => {
+                const row = `<tr>
+                    <td>${branch.code}</td>
+                    <td>${branch.name}</td>
+                    <td>${branch.address}</td>
+                    <td>
+                        <button class="btn btn-warning" onclick="editBranch(${branch.id})">Cập nhật</button>
+                        <button class="btn btn-danger" onclick="deleteBranch(${branch.id})">Xóa</button>
+                    </td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        function addBranch() {
+            const code = document.getElementById('branchCode').value;
+            const name = document.getElementById('branchName').value;
+            const address = document.getElementById('branchAddress').value;
+            if (code && name && address) {
+                const newId = branches.length ? branches[branches.length - 1].id + 1 : 1;
+                branches.push({ id: newId, code, name, address });
+                renderBranches();
+                $('#addBranchModal').modal('hide');
+                document.getElementById('addBranchForm').reset();
+            } else {
+                alert('Vui lòng nhập đầy đủ thông tin!');
+            }
+        }
+
+        function editBranch(id) {
+            const branch = branches.find(b => b.id === id);
+            document.getElementById('editBranchId').value = branch.id;
+            document.getElementById('editBranchCode').value = branch.code;
+            document.getElementById('editBranchName').value = branch.name;
+            document.getElementById('editBranchAddress').value = branch.address;
+            $('#editBranchModal').modal('show');
+        }
+
+        function saveBranchEdit() {
+            const id = parseInt(document.getElementById('editBranchId').value);
+            const code = document.getElementById('editBranchCode').value;
+            const name = document.getElementById('editBranchName').value;
+            const address = document.getElementById('editBranchAddress').value;
+            if (code && name && address) {
+                const branch = branches.find(b => b.id === id);
+                branch.code = code;
+                branch.name = name;
+                branch.address = address;
+                renderBranches();
+                $('#editBranchModal').modal('hide');
+            } else {
+                alert('Vui lòng nhập đầy đủ thông tin!');
+            }
+        }
+
+        function deleteBranch(id) {
+            if (confirm('Bạn có chắc muốn xóa chi nhánh này?')) {
+                branches = branches.filter(b => b.id !== id);
+                renderBranches();
+            }
+        }
+
+        renderBranches();
+    </script>
+</body>
+</html>

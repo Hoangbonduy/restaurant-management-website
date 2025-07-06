@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tra cứu thông tin</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body { padding: 20px; background-color: #f8f9fa; }
+        .search-container { max-width: 800px; margin: 2rem auto; }
+        .results-section { margin-top: 2rem; }
+        .results-section h4 {
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .list-group-item small { color: #6c757d; }
+        /* Style để ô chọn không quá rộng */
+        .custom-select {
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="dashboard.html" class="btn btn-secondary mb-3"><i class="fas fa-arrow-left"></i> Quay lại Dashboard</a>
+        
+        <div class="search-container">
+            <h2 class="text-center mb-4">Tra cứu thông tin</h2>
+            <form id="search-form">
+                <div class="input-group">
+                    <!-- THAY ĐỔI 1: THÊM Ô LỰA CHỌN LOẠI TRA CỨU -->
+                    <div class="input-group-prepend">
+                        <select class="custom-select" id="search-type">
+                            <option value="all" selected>Tất cả</option>
+                            <option value="dishes">Món ăn</option>
+                            <option value="employees">Nhân viên</option>
+                            <option value="branches">Chi nhánh</option>
+                            <option value="ingredients">Nguyên liệu</option>
+                        </select>
+                    </div>
+                    
+                    <input type="text" id="search-input" class="form-control form-control-lg" placeholder="Nhập từ khóa tìm kiếm...">
+                    
+                    <div class="input-group-append">
+                        <button class="btn btn-primary btn-lg" type="submit">
+                            <i class="fas fa-search"></i> Tra cứu
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div id="results-area">
+            <!-- Kết quả tìm kiếm sẽ được JS render vào đây -->
+        </div>
+
+        <div id="no-results-message" class="alert alert-warning text-center" style="display: none;">
+            Không có thông tin nào phù hợp với từ khóa của bạn.
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // --- Dữ liệu giả (không đổi) ---
+        const mockData = {
+            dishes: [
+                { id: 'M01', name: 'Phở Bò Tái Lăn', price: 55000, category: 'Món chính' },
+                { id: 'M02', name: 'Bún Chả Hà Nội', price: 45000, category: 'Món chính' },
+                { id: 'M03', name: 'Nem Rán', price: 30000, category: 'Món phụ' },
+                { id: 'M04', name: 'Nước chanh leo', price: 20000, category: 'Đồ uống' }
+            ],
+            employees: [
+                { id: 'NV01', name: 'Nguyễn Văn An', role: 'Quản lý', branch: 'Chi nhánh Quận 1' },
+                { id: 'NV02', name: 'Trần Thị Bình', role: 'Nhân viên phục vụ', branch: 'Chi nhánh Quận 3' },
+                { id: 'NV03', name: 'Lê Văn Cường', role: 'Đầu bếp', branch: 'Chi nhánh Quận 1' }
+            ],
+            branches: [
+                { id: 'CN1', name: 'Chi nhánh Quận 1', address: '123 Đường Đồng Khởi, P. Bến Nghé, Quận 1, TP.HCM' },
+                { id: 'CN2', name: 'Chi nhánh Quận 3', address: '456 Đường CMT8, P. 12, Quận 3, TP.HCM' }
+            ],
+            ingredients: [
+                { id: 'NL01', name: 'Thịt bò', unit: 'kg' },
+                { id: 'NL02', name: 'Bánh phở', unit: 'kg' },
+                { id: 'NL03', name: 'Hành lá', unit: 'bó' }
+            ]
+        };
+
+        // --- LẤY CÁC ELEMENT CẦN THIẾT ---
+        const searchForm = document.getElementById('search-form');
+        const searchInput = document.getElementById('search-input');
+        const searchTypeSelect = document.getElementById('search-type'); // Lấy thêm element select
+        const resultsArea = document.getElementById('results-area');
+        const noResultsMessage = document.getElementById('no-results-message');
+
+        // Gán sự kiện tìm kiếm
+        searchForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            if (!searchTerm) {
+                resultsArea.innerHTML = '';
+                noResultsMessage.style.display = 'none';
+                return;
+            }
+            performSearch(searchTerm);
+        });
+
+        // --- THAY ĐỔI 2: CẬP NHẬT HÀM TÌM KIẾM ĐỂ XỬ LÝ LOẠI TRA CỨU ---
+        function performSearch(searchTerm) {
+            const searchType = searchTypeSelect.value; // Lấy loại tra cứu người dùng đã chọn
+
+            // Khởi tạo các mảng kết quả rỗng
+            let dishResults = [], employeeResults = [], branchResults = [], ingredientResults = [];
+
+            // Hàm lọc chung
+            const filterByName = (item) => item.name.toLowerCase().includes(searchTerm);
+            
+            // Dựa vào loại tra cứu để tìm kiếm trong danh mục tương ứng
+            if (searchType === 'all' || searchType === 'dishes') {
+                dishResults = mockData.dishes.filter(filterByName);
+            }
+            if (searchType === 'all' || searchType === 'employees') {
+                employeeResults = mockData.employees.filter(item => 
+                    item.name.toLowerCase().includes(searchTerm) || 
+                    item.role.toLowerCase().includes(searchTerm)
+                );
+            }
+            if (searchType === 'all' || searchType === 'branches') {
+                branchResults = mockData.branches.filter(item => 
+                    item.name.toLowerCase().includes(searchTerm) || 
+                    item.address.toLowerCase().includes(searchTerm)
+                );
+            }
+            if (searchType === 'all' || searchType === 'ingredients') {
+                ingredientResults = mockData.ingredients.filter(filterByName);
+            }
+
+            // Hiển thị kết quả (hàm render không cần thay đổi)
+            renderResults(dishResults, employeeResults, branchResults, ingredientResults);
+        }
+        
+        // --- HÀM RENDER (KHÔNG CẦN THAY ĐỔI) ---
+        function renderResults(dishes, employees, branches, ingredients) {
+            resultsArea.innerHTML = '';
+            if (dishes.length === 0 && employees.length === 0 && branches.length === 0 && ingredients.length === 0) {
+                noResultsMessage.style.display = 'block';
+                return;
+            }
+
+            noResultsMessage.style.display = 'none';
+            let html = '';
+
+            // Render món ăn
+            if (dishes.length > 0) {
+                html += '<div class="results-section">';
+                html += '<h4><i class="fas fa-utensils"></i> Kết quả Món ăn (' + dishes.length + ')</h4>';
+                html += '<ul class="list-group">';
+                dishes.forEach(d => {
+                    html += `<li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div><strong>${d.name}</strong><br><small>Loại: ${d.category}</small></div>
+                                <span class="badge badge-primary badge-pill">${d.price.toLocaleString('vi-VN')} VNĐ</span>
+                             </li>`;
+                });
+                html += '</ul></div>';
+            }
+
+            // Render nhân viên
+            if (employees.length > 0) {
+                html += '<div class="results-section">';
+                html += '<h4><i class="fas fa-user-tie"></i> Kết quả Nhân viên (' + employees.length + ')</h4>';
+                html += '<ul class="list-group">';
+                employees.forEach(e => {
+                    html += `<li class="list-group-item">
+                                <strong>${e.name}</strong><br><small>Chức vụ: ${e.role} | Chi nhánh: ${e.branch}</small>
+                             </li>`;
+                });
+                html += '</ul></div>';
+            }
+
+            // Render chi nhánh
+            if (branches.length > 0) {
+                html += '<div class="results-section">';
+                html += '<h4><i class="fas fa-store-alt"></i> Kết quả Chi nhánh (' + branches.length + ')</h4>';
+                html += '<ul class="list-group">';
+                branches.forEach(b => {
+                    html += `<li class="list-group-item">
+                                <strong>${b.name}</strong><br><small>${b.address}</small>
+                             </li>`;
+                });
+                html += '</ul></div>';
+            }
+            
+            // Render nguyên liệu
+            if (ingredients.length > 0) {
+                html += '<div class="results-section">';
+                html += '<h4><i class="fas fa-leaf"></i> Kết quả Nguyên liệu (' + ingredients.length + ')</h4>';
+                html += '<ul class="list-group">';
+                ingredients.forEach(i => {
+                    html += `<li class="list-group-item">
+                                <strong>${i.name}</strong><br><small>Đơn vị: ${i.unit}</small>
+                             </li>`;
+                });
+                html += '</ul></div>';
+            }
+            
+            resultsArea.innerHTML = html;
+        }
+    });
+    </script>
+</body>
+</html>

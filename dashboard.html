@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý nhà hàng</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Font Awesome CSS cho biểu tượng -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            background-color: #F5F5F5;
+            font-family: Arial, sans-serif;
+        }
+        .menu {
+            background-color: #4A2C6D;
+            color: white;
+            min-height: 100vh;
+            padding-top: 20px;
+        }
+        .user-info {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .user-info img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+        .user-info h5 {
+            color: white;
+            margin: 0;
+        }
+        .menu .nav-link {
+            color: white;
+            padding: 15px 20px;
+        }
+        .menu .nav-link:hover {
+            background-color: #5A3C7D;
+        }
+        .menu .nav-link.active {
+            background-color: #6A3C8D;
+            font-weight: bold;
+        }
+        .content {
+            padding: 20px;
+        }
+        .card {
+            margin-bottom: 20px;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        .card:hover { transform: scale(1.05); }
+        .card-body { text-align: center; padding: 20px; }
+        .card i { color: #4A2C6D; margin-bottom: 10px; }
+        .btn-primary { background-color: #4A2C6D; border: none; }
+        .btn-primary:hover { background-color: #6A3C8D; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 menu">
+                <div class="user-info">
+                    <h5>Quản lý nhà hàng</h5>
+                </div>
+                <ul class="nav flex-column nav-pills" id="sidebarMenu" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="info-tab" data-toggle="pill" href="#info" role="tab">Thông tin người dùng</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="danhmuc-tab" data-toggle="pill" href="#danhmuc" role="tab">Quản lý nội bộ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="quytrinh-tab" data-toggle="pill" href="#quytrinh" role="tab">Quản lý nghiệp vụ</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" id="khachhang-tab" data-toggle="pill" href="#khachhang" role="tab">Quản lý khách hàng</a>
+                  </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="baocao-tab" data-toggle="pill" href="#baocao" role="tab">Báo cáo thống kê và tra cứu</a>
+                    </li>
+                    <!-- Nút Đăng xuất -->
+                    <li class="nav-item logout-btn">
+                        <a href="index.html" class="nav-link">Đăng xuất</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- Main Content -->
+            <div class="col-md-10 content">
+                <div class="tab-content" id="sidebarMenuContent">
+                    <!-- Thông tin người dùng -->
+                    <div class="tab-pane fade show active" id="info" role="tabpanel">
+                        <h2>Thông tin người dùng</h2>
+                        <p>Mã người quản lý: <span id="ma_nql">01</span></p>
+                        <p>Mã chi nhánh: <span id="ma_chinhanh">CN1</span></p>
+                        <p>Họ tên: <span id="userName">Nguyễn Văn A</span></p>
+                        <p>Ngày sinh: <span id="dateofbirth">16/07/2004</span></p>
+                        <p>Số điện thoại: <span id="phonenumber">0836475535</span></p>
+                        <p>Email: <span id="userEmail">nvana@example.com</span></p>
+                        <p>Địa chỉ: <span id="address">Hà Nội</span></p>
+                        <p>Quyền: <span id="userRole">Quản trị viên</span></p>
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#editUserModal">Chỉnh sửa</button>
+                    </div>
+                    <!-- Quản lý nội bộ -->
+                    <div class="tab-pane fade" id="danhmuc" role="tabpanel">
+                        <h2>Quản lý nội bộ</h2>
+                        <div class="row">
+                            <div class="col-md-4"><div class="card"><div class="card-body"><i class="fas fa-building fa-3x"></i><h5 class="card-title">Quản lý chi nhánh</h5><a href="quanly_chinhanh.html" class="btn btn-primary">Quản lý</a></div></div></div>
+                            <div class="col-md-4"><div class="card"><div class="card-body"><i class="fas fa-users fa-3x"></i><h5 class="card-title">Quản lý nhân viên</h5><a href="quanly_nhanvien.html" class="btn btn-primary">Quản lý</a></div></div></div>
+                            <div class="col-md-4"><div class="card"><div class="card-body"><i class="fas fa-truck fa-3x"></i><h5 class="card-title">Quản lý nhà cung cấp</h5><a href="quanly_nhacungcap.html" class="btn btn-primary">Quản lý</a></div></div></div>
+                            <div class="col-md-4"><div class="card"><div class="card-body"><i class="fas fa-truck fa-3x"></i><h5 class="card-title">Xác nhận hồ sơ nhân viên</h5><a href="xac_nhan_ho_so.html" class="btn btn-primary">Quản lý</a></div></div></div>
+                            <div class="col-md-4"><div class="card"><div class="card-body"><i class="fas fa-utensils fa-3x"></i><h5 class="card-title">Quản lý món ăn</h5><a href="quanly_monan.html" class="btn btn-primary">Quản lý</a></div></div></div>
+                            <div class="col-md-4"><div class="card"><div class="card-body"><i class="fas fa-leaf fa-3x"></i><h5 class="card-title">Quản lý nguyên liệu</h5><a href="quanly_nguyenlieu.html" class="btn btn-primary">Quản lý</a></div></div></div>
+                        </div>
+                    </div>
+                    <!-- Quản lý nghiệp vụ -->
+                    <div class="tab-pane fade" id="quytrinh" role="tabpanel">
+                        <h2>Quản lý nghiệp vụ</h2>
+                        <div class="row">
+                            <div class="col-md-3"><div class="card"><div class="card-body"><i class="fas fa-chair fa-3x"></i><h5 class="card-title">Đặt bàn</h5><a href="dat_ban.html" class="btn btn-primary">Quản lý</a></div></div></div>
+                            <div class="col-md-3"><div class="card"><div class="card-body"><i class="fas fa-concierge-bell fa-3x"></i><h5 class="card-title">Gọi món</h5><a href="goi_mon.html" class="btn btn-primary">Quản lý</a></div></div></div>
+                            <div class="col-md-3"><div class="card"><div class="card-body"><i class="fas fa-credit-card fa-3x"></i><h5 class="card-title">Thanh toán</h5><a href="thanh_toan.html" class="btn btn-primary">Quản lý</a></div></div></div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="khachhang" role="tabpanel">
+                      <h2>Quản lý khách hàng</h2>
+                      <div class="row">
+                          <div class="col-md-3"><div class="card"><div class="card-body"><i class="fas fa-user fa-3x"></i><h5 class="card-title">Quản lý khách hàng (thường + thân thiết)</h5><a href="quanly_khachhang.html" class="btn btn-primary">Quản lý</a></div></div></div>
+                      </div>
+                  </div>
+                    <!-- Báo cáo thống kê -->
+                    <div class="tab-pane fade" id="baocao" role="tabpanel">
+                        <h2>Báo cáo thống kê và tra cứu</h2>
+                        <div class="row">
+                            <div class="col-md-4"><div class="card"><div class="card-body"><i class="fas fa-chart-line fa-3x"></i><h5 class="card-title">Báo cáo doanh thu</h5><a href="baocao_doanhthu.html" class="btn btn-primary">Xem</a></div></div></div>
+                            <div class="col-md-4"><div class="card"><div class="card-body"><i class="fas fa-coins fa-3x"></i><h5 class="card-title">Báo cáo chi phí nguyên liệu</h5><a href="baocao_chiphinguyenlieu.html" class="btn btn-primary">Xem</a></div></div></div>
+                            <div class="col-md-4"><div class="card"><div class="card-body"><i class="fas fa-users-cog fa-3x"></i><h5 class="card-title">Báo cáo khách hàng</h5><a href="baocao_khachhang.html" class="btn btn-primary">Xem</a></div></div></div>
+                            <div class="col-md-4"><div class="card"><div class="card-body"><i class="fas fa-users-cog fa-3x"></i><h5 class="card-title">Báo cáo hiệu quả thực đơn</h5><a href="baocao_hieuquathucdon.html" class="btn btn-primary">Xem</a></div></div></div>
+                            <div class="col-md-4"><div class="card"><div class="card-body"><i class="fas fa-users-cog fa-3x"></i><h5 class="card-title">Tra cứu</h5><a href="tra_cuu.html" class="btn btn-primary">Xem</a></div></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal chỉnh sửa thông tin người dùng -->
+<div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editUserModalLabel">Chỉnh sửa thông tin người dùng</h5>
+          <button type="button" class="close" data-dismiss="modal">×</button>
+        </div>
+        <div class="modal-body">
+          <form id="editUserForm">
+            <div class="form-group">
+              <label for="editName">Họ tên</label>
+              <input type="text" class="form-control" id="editName" value="Nguyễn Văn A">
+            </div>
+            <div class="form-group">
+              <label for="editDob">Ngày sinh</label>
+              <input type="date" class="form-control" id="editDob" value="2004-07-16">
+            </div>
+            <div class="form-group">
+              <label for="editPhone">Số điện thoại</label>
+              <input type="text" class="form-control" id="editPhone" value="0836475535">
+            </div>
+            <div class="form-group">
+              <label for="editEmail">Email</label>
+              <input type="email" class="form-control" id="editEmail" value="nvana@example.com">
+            </div>
+            <div class="form-group">
+              <label for="editAddress">Địa chỉ</label>
+              <input type="text" class="form-control" id="editAddress" value="Hà Nội">
+            </div>
+            <hr>
+            <h6>Đổi mật khẩu</h6>
+            <div class="form-group">
+              <label for="currentPassword">Mật khẩu hiện tại</label>
+              <input type="password" class="form-control" id="currentPassword" placeholder="Nhập mật khẩu hiện tại">
+            </div>
+            <div class="form-group">
+              <label for="newPassword">Mật khẩu mới</label>
+              <input type="password" class="form-control" id="newPassword" placeholder="Nhập mật khẩu mới">
+            </div>
+            <div class="form-group">
+              <label for="confirmPassword">Xác nhận mật khẩu mới</label>
+              <input type="password" class="form-control" id="confirmPassword" placeholder="Nhập lại mật khẩu mới">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+          <button type="button" class="btn btn-primary" onclick="saveUserInfo()">Lưu thay đổi</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+  function saveUserInfo() {
+      const name    = document.getElementById('editName').value;
+      const dob     = document.getElementById('editDob').value;
+      const phone   = document.getElementById('editPhone').value;
+      const email   = document.getElementById('editEmail').value;
+      const address = document.getElementById('editAddress').value;
+  
+      // Xử lý đổi mật khẩu
+      const currentPwd = document.getElementById('currentPassword').value;
+      const newPwd     = document.getElementById('newPassword').value;
+      const confirmPwd = document.getElementById('confirmPassword').value;
+  
+      if (newPwd || confirmPwd) {
+        if (!currentPwd) {
+          return alert('Vui lòng nhập mật khẩu hiện tại để đổi mật khẩu.');
+        }
+        if (newPwd !== confirmPwd) {
+          return alert('Mật khẩu mới và xác nhận không khớp.');
+        }
+        // TODO: gọi API xác thực currentPwd + cập nhật mật khẩu mới
+        console.log('Đổi mật khẩu từ', currentPwd, 'sang', newPwd);
+      }
+  
+      // Cập nhật hiển thị thông tin người dùng
+      document.getElementById('userName').textContent    = name;
+      document.getElementById('dateofbirth').textContent = new Date(dob).toLocaleDateString('vi-VN');
+      document.getElementById('phonenumber').textContent = phone;
+      document.getElementById('userEmail').textContent   = email;
+      document.getElementById('address').textContent     = address;
+  
+      $('#editUserModal').modal('hide');
+  }
+  </script>  
+
+    <!-- Bootstrap JS và phụ thuộc -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function saveUserInfo() {
+            const name = document.getElementById('editName').value;
+            const email = document.getElementById('editEmail').value;
+            const role = document.getElementById('editRole').value;
+            
+            document.getElementById('userName').textContent = name;
+            document.getElementById('userEmail').textContent = email;
+            document.getElementById('userRole').textContent = role;
+            
+            $('#editUserModal').modal('hide');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+/* Reset và font icon */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
+
+.sidebar {
+    width: 280px;
+    background: #2c3e50;
+    height: 100vh;
+    position: fixed;
+    color: #ecf0f1;
+}
+
+.logo {
+    padding: 25px;
+    border-bottom: 1px solid #34495e;
+}
+
+.logo h1 {
+    font-size: 1.4rem;
+    color: #fff;
+    margin: 0;
+}
+
+.main-menu {
+    padding: 20px 0;
+}
+
+.menu-link {
+    display: flex;
+    align-items: center;
+    padding: 15px 25px;
+    color: #bdc3c7;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.menu-link:hover {
+    background: #34495e;
+    color: #fff;
+}
+
+.menu-link.active {
+    background: #3498db;
+    color: #fff;
+}
+
+.menu-link i:first-child {
+    width: 25px;
+    font-size: 1.1rem;
+    margin-right: 15px;
+}
+
+.arrow {
+    margin-left: auto;
+    transition: transform 0.3s ease;
+}
+
+.sub-menu {
+    background: #34495e;
+    padding-left: 30px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+
+.sub-menu li a {
+    padding: 12px 25px;
+    display: block;
+    color: #95a5a6;
+    font-size: 0.95rem;
+    text-decoration: none;
+    position: relative;
+}
+
+.sub-menu li a:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.05);
+}
+
+.sub-menu li a i {
+    margin-right: 10px;
+    width: 20px;
+    font-size: 0.9rem;
+}
+
+/* Khi submenu mở */
+.menu-item-has-children.active .arrow {
+    transform: rotate(90deg);
+}
+
+.menu-item-has-children.active .sub-menu {
+    max-height: 500px;
+}
